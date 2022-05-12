@@ -4,6 +4,9 @@ public class Task5 {
     public static void main(String[] args) {
         AdjacencyMatrixGraph AMG;
         AdjacencyListGraph ALG;
+        // This next commented are for allowing the user to enter the graph himself, the
+        // test cases highlighted in the portofolio are hard coded
+
         // try (Scanner sc = new Scanner(System.in)) {
         // System.out.print("Enter the number of nodes: ");
         // int nodes_num = sc.nextInt();
@@ -23,10 +26,7 @@ public class Task5 {
         // }
         // }
         // }
-        // AMG.print_graph();
-        // ALG.print_graph();
-        int[][] G = { { 0, 7, 0, 8, 0, 0 }, { 7, 0, 6, 3, 0, 0 }, { 0, 6, 0, 4, 2, 5 }, { 8, 3, 4, 0, 3, 0 },
-                { 0, 0, 2, 3, 0, 2 }, { 0, 0, 5, 0, 2, 0 } };
+
         AMG = new AdjacencyMatrixGraph(5);
         AMG.add_edge(0, 1, 5);
         AMG.add_edge(0, 2, 2);
@@ -35,10 +35,7 @@ public class Task5 {
         AMG.add_edge(2, 3, 5);
         AMG.add_edge(2, 4, 8);
         AMG.add_edge(3, 4, 5);
-        // AMG.print_graph();
-        AdjacencyMatrixGraph AMG2 = new AdjacencyMatrixGraph(G.length);
-        AMG2.adjacency_matrix = G;
-        AMG2.Prim(); // ALG = new AdjacencyListGraph(5);
+        AMG.print_graph();
         ALG = new AdjacencyListGraph(5);
         ALG.add_edge(0, 1, 5);
         ALG.add_edge(0, 2, 2);
@@ -47,14 +44,21 @@ public class Task5 {
         ALG.add_edge(2, 3, 5);
         ALG.add_edge(2, 4, 8);
         ALG.add_edge(3, 4, 5);
-        // ALG.print_graph();
-        // ALG.BFS(0);
-        // ALG.DFS(2);
+        ALG.print_graph();
+        ALG.BFS(0);
+        ALG.DFS(0);
+        // This is the undirected graph used by prims algorithm for task 7
+
+        int[][] G = { { 0, 7, 0, 8, 0, 0 }, { 7, 0, 6, 3, 0, 0 }, { 0, 6, 0, 4, 2, 5 }, { 8, 3, 4, 0, 3, 0 },
+                { 0, 0, 2, 3, 0, 2 }, { 0, 0, 5, 0, 2, 0 } };
+        AdjacencyMatrixGraph AMG2 = new AdjacencyMatrixGraph(G.length);
+        AMG2.adjacency_matrix = G;
+        AMG2.Prim();
 
     }
 }
 
-class AdjacencyMatrixGraph {
+class AdjacencyMatrixGraph { // Adjacency matrix graph implimentation for task 5
     public int adjacency_matrix[][];
     public int nodes_total;
 
@@ -88,10 +92,9 @@ class AdjacencyMatrixGraph {
             }
             System.out.println(s);
         }
-        // System.out.println(s);
     }
 
-    public void Prim() {
+    public void Prim() { // Prims algorithm for task 7, finds the maximum spanning tree
         boolean[] viseted = new boolean[nodes_total];
         int start_node = 0;
         viseted[start_node] = true;
@@ -120,21 +123,21 @@ class AdjacencyMatrixGraph {
     }
 }
 
-class AdjacencyListEdge {
+class AdjacencyListNodes { // Adjacency matrix list nodes, used for the linked list in the adjacency list
     public int start;
     public int end;
     public int weight;
 
-    public AdjacencyListEdge(int start, int end, int weight) {
+    public AdjacencyListNodes(int start, int end, int weight) {
         this.start = start;
         this.end = end;
         this.weight = weight;
     }
 }
 
-class AdjacencyListGraph {
+class AdjacencyListGraph { // Adjacency list graph implimentation for task 5
     int nodes_total;
-    LinkedList<AdjacencyListEdge>[] adjacency_list;
+    LinkedList<AdjacencyListNodes>[] adjacency_list;
 
     AdjacencyListGraph(int nodes_total) {
         this.nodes_total = nodes_total;
@@ -145,13 +148,13 @@ class AdjacencyListGraph {
     }
 
     public void add_edge(int start, int end, int weight) {
-        AdjacencyListEdge edge = new AdjacencyListEdge(start, end, weight);
-        adjacency_list[start].add(edge);
+        AdjacencyListNodes node = new AdjacencyListNodes(start, end, weight);
+        adjacency_list[start].add(node);
     }
 
     public void print_graph() {
         for (int i = 0; i < nodes_total; i++) {
-            LinkedList<AdjacencyListEdge> list = adjacency_list[i];
+            LinkedList<AdjacencyListNodes> list = adjacency_list[i];
             for (int j = 0; j < list.size(); j++) {
                 System.out.println("Node " + i + " and Node " +
                         list.get(j).end + " connected with Weight " + list.get(j).weight);
@@ -159,7 +162,7 @@ class AdjacencyListGraph {
         }
     }
 
-    void BFS(int node_number) {
+    public void BFS(int node_number) { // BFS function for Task 6
         boolean visited[] = new boolean[nodes_total];
         LinkedList<Integer> queue = new LinkedList<Integer>();
         visited[node_number] = true;
@@ -167,12 +170,10 @@ class AdjacencyListGraph {
         while (queue.size() != 0) {
             node_number = queue.poll();
             System.out.print(node_number + " ");
-            Iterator<AdjacencyListEdge> i = adjacency_list[node_number].listIterator();
+            Iterator<AdjacencyListNodes> i = adjacency_list[node_number].listIterator();
             while (i.hasNext()) {
-                AdjacencyListEdge n = i.next();
-                // System.out.print(n.start);
+                AdjacencyListNodes n = i.next();
                 if (!visited[n.end]) {
-                    // System.out.print(n);
                     visited[n.end] = true;
                     queue.add(n.end);
                 }
@@ -181,20 +182,20 @@ class AdjacencyListGraph {
         }
     }
 
-    void DFSUtil(int node_number, boolean visited[]) {
+    private void DFSUtil(int node_number, boolean visited[]) { // DFS function for Task 6
 
         visited[node_number] = true;
         System.out.print(node_number + " ");
-        Iterator<AdjacencyListEdge> i = adjacency_list[node_number].listIterator();
+        Iterator<AdjacencyListNodes> i = adjacency_list[node_number].listIterator();
         while (i.hasNext()) {
-            AdjacencyListEdge n = i.next();
+            AdjacencyListNodes n = i.next();
             if (!visited[n.end]) {
                 DFSUtil(n.end, visited);
             }
         }
     }
 
-    void DFS(int start_node) {
+    public void DFS(int start_node) { // DFS function for Task 6
         boolean visited[] = new boolean[nodes_total];
         DFSUtil(start_node, visited);
     }
